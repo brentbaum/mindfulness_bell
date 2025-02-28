@@ -6,6 +6,100 @@ class MacOSFlashService {
   static const String channelName = 'com.mindfulnessbell/overlay';
   static const MethodChannel _channel = MethodChannel(channelName);
 
+  // Add callback for microphone status changes
+  Function(bool isInUse)? onMicrophoneStatusChanged;
+
+  // Constructor now initializes listeners
+  MacOSFlashService._internal() {
+    debugPrint(
+        'MacOSFlashService: Initialized with channel name: $channelName');
+
+    // Set up method call handler for microphone status changes
+    _channel.setMethodCallHandler(_handleMethodCall);
+  }
+
+  // Handle incoming method calls from native code
+  Future<dynamic> _handleMethodCall(MethodCall call) async {
+    debugPrint('MacOSFlashService: Received method call: ${call.method}');
+
+    switch (call.method) {
+      case 'microphoneStatusChanged':
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final isInUse = args['isInUse'] as bool;
+
+        debugPrint('MacOSFlashService: Microphone status changed to: $isInUse');
+
+        // Notify listener if registered
+        if (onMicrophoneStatusChanged != null) {
+          onMicrophoneStatusChanged!(isInUse);
+        }
+        return null;
+
+      default:
+        debugPrint('MacOSFlashService: Unknown method call: ${call.method}');
+        throw PlatformException(
+          code: 'UNIMPLEMENTED',
+          message: 'Method not implemented: ${call.method}',
+        );
+    }
+  }
+
+  /// Start monitoring microphone usage
+  Future<bool> startMicrophoneMonitoring() async {
+    if (defaultTargetPlatform != TargetPlatform.macOS) {
+      debugPrint(
+          'MacOSFlashService: Microphone monitoring only supported on macOS');
+      return false;
+    }
+
+    debugPrint('MacOSFlashService: Starting microphone monitoring');
+    try {
+      final result =
+          await _channel.invokeMethod<bool>('startMicrophoneMonitoring');
+      debugPrint(
+          'MacOSFlashService: startMicrophoneMonitoring result: $result');
+      return result ?? false;
+    } catch (e) {
+      debugPrint('MacOSFlashService: Error starting microphone monitoring: $e');
+      return false;
+    }
+  }
+
+  /// Stop monitoring microphone usage
+  Future<bool> stopMicrophoneMonitoring() async {
+    if (defaultTargetPlatform != TargetPlatform.macOS) {
+      return false;
+    }
+
+    debugPrint('MacOSFlashService: Stopping microphone monitoring');
+    try {
+      final result =
+          await _channel.invokeMethod<bool>('stopMicrophoneMonitoring');
+      debugPrint('MacOSFlashService: stopMicrophoneMonitoring result: $result');
+      return result ?? false;
+    } catch (e) {
+      debugPrint('MacOSFlashService: Error stopping microphone monitoring: $e');
+      return false;
+    }
+  }
+
+  /// Get current microphone status (true if in use)
+  Future<bool> getMicrophoneStatus() async {
+    if (defaultTargetPlatform != TargetPlatform.macOS) {
+      return false;
+    }
+
+    debugPrint('MacOSFlashService: Getting current microphone status');
+    try {
+      final result = await _channel.invokeMethod<bool>('getMicrophoneStatus');
+      debugPrint('MacOSFlashService: getMicrophoneStatus result: $result');
+      return result ?? false;
+    } catch (e) {
+      debugPrint('MacOSFlashService: Error getting microphone status: $e');
+      return false;
+    }
+  }
+
   /// Request accessibility permissions required for system-wide overlay
   Future<void> requestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.macOS) {
@@ -153,8 +247,4 @@ class MacOSFlashService {
   /// Singleton instance
   static final MacOSFlashService _instance = MacOSFlashService._internal();
   factory MacOSFlashService() => _instance;
-  MacOSFlashService._internal() {
-    debugPrint(
-        'MacOSFlashService: Initialized with channel name: $channelName');
-  }
 }

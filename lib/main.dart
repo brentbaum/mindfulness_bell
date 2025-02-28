@@ -144,16 +144,15 @@ class _HomePageState extends State<HomePage>
     debugPrint('HomePage: initState called');
     _loadAudio();
     _setupFlashAnimation();
+    _setupMicrophoneMonitoring();
 
-    // Request permissions when app starts up
-    debugPrint('HomePage: Scheduling permission request after first frame');
+    // Debug check channel availability
     WidgetsBinding.instance.addPostFrameCallback((_) {
       debugPrint('HomePage: Post frame callback triggered');
-
-      // Debug check channel availability
       _debugCheckChannelAvailability();
 
-      _requestPermissionsIfNeeded();
+      // Removed automatic permission request on startup
+      // _requestPermissionsIfNeeded();
     });
   }
 
@@ -337,8 +336,55 @@ class _HomePageState extends State<HomePage>
     });
   }
 
+  // Setup microphone monitoring
+  void _setupMicrophoneMonitoring() {
+    debugPrint('HomePage: Setting up microphone monitoring');
+
+    // Set up callback for microphone status changes
+    _flashService.onMicrophoneStatusChanged = (isInUse) {
+      debugPrint('HomePage: Microphone status changed to: $isInUse');
+
+      // Automatically enable meeting mode when microphone is in use
+      if (isInUse != _inMeetingMode) {
+        setState(() {
+          _inMeetingMode = isInUse;
+          debugPrint(
+              'HomePage: Automatically ${isInUse ? "enabled" : "disabled"} meeting mode');
+        });
+      }
+    };
+
+    // Start monitoring after a short delay to let the app initialize
+    Future.delayed(const Duration(seconds: 1), () async {
+      // Get initial microphone status
+      try {
+        final initialStatus = await _flashService.getMicrophoneStatus();
+        debugPrint('HomePage: Initial microphone status: $initialStatus');
+
+        // Set initial meeting mode based on microphone status
+        if (initialStatus != _inMeetingMode) {
+          setState(() {
+            _inMeetingMode = initialStatus;
+            if (initialStatus) {
+              debugPrint(
+                  'HomePage: Initially enabling meeting mode due to active microphone');
+            }
+          });
+        }
+
+        // Start continuous monitoring
+        final started = await _flashService.startMicrophoneMonitoring();
+        debugPrint('HomePage: Microphone monitoring started: $started');
+      } catch (e) {
+        debugPrint('HomePage: Error setting up microphone monitoring: $e');
+      }
+    });
+  }
+
   @override
   void dispose() {
+    // Stop microphone monitoring when app is closed
+    _flashService.stopMicrophoneMonitoring();
     _timer?.cancel();
     _intervalController.dispose();
     _audioPlayer.dispose();
@@ -571,98 +617,182 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget _buildRunningScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'Mindfulness Bell',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF5D4037),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Current interval display
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Text(
-                  _useRandomIntervals
-                      ? 'Random Interval: $_currentIntervalMinutes minutes'
-                      : 'Interval: $_currentIntervalMinutes minutes',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF5D4037),
-                  ),
+    return Stack(
+      children: [
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Mindfulness Bell',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF5D4037),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  _formatTime(_remainingSeconds),
-                  style: const TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF5D4037),
-                  ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Current interval display
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                if (_inMeetingMode)
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    Text(
+                      _useRandomIntervals
+                          ? 'Random Interval: $_currentIntervalMinutes minutes'
+                          : 'Interval: $_currentIntervalMinutes minutes',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(0xFF5D4037),
+                      ),
                     ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.mic_off, size: 16, color: Color(0xFF5D4037)),
-                        SizedBox(width: 4),
-                        Text(
-                          'Meeting Mode',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF5D4037),
-                          ),
+                    const SizedBox(height: 10),
+                    Text(
+                      _formatTime(_remainingSeconds),
+                      style: const TextStyle(
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5D4037),
+                      ),
+                    ),
+                    if (_inMeetingMode)
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                      ],
-                    ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.mic_off,
+                                    size: 16, color: Color(0xFF5D4037)),
+                                SizedBox(width: 4),
+                                Text(
+                                  'Meeting Mode',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF5D4037),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              "I've muted the mic because you're in a meeting",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                                color: Color(0xFF5D4037),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 60),
+
+              // Stop button
+              ElevatedButton(
+                onPressed: _toggleTimer,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
-              ],
+                  backgroundColor: const Color(0xFF8D6E63),
+                ),
+                child: const Text(
+                  'Stop',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Meeting mode toggle in bottom right corner
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  _inMeetingMode = !_inMeetingMode;
+                });
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _inMeetingMode
+                        ? const Color(0xFF5D4037)
+                        : Colors.transparent,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: Checkbox(
+                        value: _inMeetingMode,
+                        onChanged: (value) {
+                          setState(() {
+                            _inMeetingMode = value ?? false;
+                          });
+                        },
+                        activeColor: const Color(0xFF5D4037),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Meeting Mode',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF5D4037),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.mic_off,
+                      size: 16,
+                      color: Color(0xFF5D4037),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-
-          const SizedBox(height: 60),
-
-          // Stop button
-          ElevatedButton(
-            onPressed: _toggleTimer,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
-              ),
-              backgroundColor: const Color(0xFF8D6E63),
-            ),
-            child: const Text(
-              'Stop',
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

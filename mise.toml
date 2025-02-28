@@ -1,0 +1,33 @@
+[tasks]
+# Build a release version of the macOS app and push a GitHub release
+release = """
+echo "Building Eternal Now Doorbell for macOS..."
+flutter clean
+flutter pub get
+flutter build macos --release
+echo "Build completed! The app can be found at:"
+echo "$(pwd)/build/macos/Build/Products/Release/mindfulness_bell.app"
+
+# Get the current version from pubspec.yaml
+VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | tr -d "'")
+echo "Creating GitHub release for version $VERSION..."
+
+# Create a git tag for the version
+git tag -a "v$VERSION" -m "Release v$VERSION"
+git push origin "v$VERSION"
+
+# Zip the app for GitHub release
+APP_NAME="EternalNowDoorbell"
+ZIP_PATH="./build/${APP_NAME}-v${VERSION}-macos.zip"
+echo "Creating zip archive of the app..."
+ditto -c -k --sequesterRsrc --keepParent "./build/macos/Build/Products/Release/mindfulness_bell.app" "$ZIP_PATH"
+echo "App zipped successfully at $ZIP_PATH"
+
+# Create GitHub release using gh CLI
+gh release create "v$VERSION" \
+  --title "Eternal Now Doorbell v$VERSION" \
+  --notes "Release v$VERSION of Eternal Now Doorbell" \
+  "$ZIP_PATH"
+
+echo "GitHub release v$VERSION created successfully!"
+""" 

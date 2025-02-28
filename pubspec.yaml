@@ -1,7 +1,7 @@
 name: mindfulness_bell
 description: A simple mindfulness bell app with customizable intervals.
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=2.17.0 <3.0.0"
