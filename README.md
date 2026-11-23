@@ -1,15 +1,16 @@
-# Mindfulness Bell
+# Eternal Now Doorbell
 
-A beautiful, minimalist mindfulness bell app for macOS that helps you stay present throughout your day with gentle reminders.
+A quiet mindfulness bell for the macOS menu bar. At your chosen interval it rings a bell and washes the screen in a soft sage light, then fades away.
 
-![Mindfulness Bell App](screenshots/app_screenshot.png)
+![Eternal Now Doorbell](screenshots/app_screenshot.png)
 
 ## Features
 
-- **Customizable Intervals**: Set specific intervals or use random timings between 5-30 minutes
-- **Visual Reminders**: Gentle full-screen flash with smooth fade in/out animation
-- **Meeting Mode**: Visual-only notifications for when you're in meetings
-- **System Integration**: Works even when the app isn't in focus
+- **Menu bar app**: a ripple icon shows time to the next bell, with Start/Pause, Ring now and Open at login. No Dock icon.
+- **Intervals**: a fixed interval (1–180 minutes) or random between 5 and 30 minutes. Settings persist.
+- **Gentle flash**: a full-screen color wash on every display, including over full-screen apps. It never takes clicks or focus, and it needs no special permissions.
+- **Meeting mode**: flash only, no sound. Turns on by itself while any app is using your mic.
+- **Open at login**: resumes the bell quietly in the menu bar if it was running when you quit.
 
 ## Installation
 
@@ -17,7 +18,7 @@ A beautiful, minimalist mindfulness bell app for macOS that helps you stay prese
 
 1. Download the latest release from the [Releases](https://github.com/brentbaum/mindfulness_bell/releases) page
 2. Unzip the file
-3. Right-click (or Control+click) on `mindfulness_bell.app` and select "Open"
+3. Right-click (or Control+click) on `Eternal Now Doorbell.app` and select "Open"
 4. Click "Open" in the security dialog that appears
 
 ### Option 2: Build from source
@@ -32,24 +33,16 @@ flutter pub get
 flutter run -d macos
 ```
 
-## Permissions
-
-To enable the full-screen flash feature, you'll need to grant accessibility permissions:
-
-1. Click the "Enable Full Screen Flash" button in the app
-2. Follow the prompts to open System Preferences
-3. In Security & Privacy > Privacy > Accessibility, add and enable mindfulness_bell.app
-
-## How It Works
-
-The app uses Flutter for the UI and native macOS integration to create system-wide visual notifications. The flash animation fades in over 1 second and fades out over 5 seconds for a gentle, non-disruptive reminder.
-
 ## Development
 
-This project is built with Flutter and uses the following packages:
-- `audioplayers` for sound
-- `url_launcher` for opening system preferences
-- Custom native channel integration for macOS accessibility features
+```bash
+mise run build    # release build, signed with your Apple Development certificate
+mise run install  # build, then replace /Applications/Eternal Now Doorbell.app and launch
+mise run icon     # re-render the icon set from tool/render_icon.swift
+mise run release  # build, tag and publish a GitHub release (not notarized)
+```
+
+Design tokens live in `lib/ui.dart` (Stillwater palette). The native side (menu bar, flash overlay, mic monitor, launch at login) is in `macos/Runner/`, and the method channel contract is in `lib/native_bridge.dart`.
 
 ## License
 

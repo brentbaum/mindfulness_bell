@@ -29,6 +29,9 @@
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
 		3FE4A8B1C826C940080A2358 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48CB5B659430E43776D8458E /* Pods_Runner.framework */; };
 		CC5E440E2864E035C1839EAE /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 257914144C3FD64C23DAED36 /* Pods_RunnerTests.framework */; };
+		E7A1B2C3D4E5F60000000200 /* MicrophoneMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1B2C3D4E5F60000000100 /* MicrophoneMonitor.swift */; };
+		E7A1B2C3D4E5F60000000201 /* FlashOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1B2C3D4E5F60000000101 /* FlashOverlay.swift */; };
+		E7A1B2C3D4E5F60000000202 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1B2C3D4E5F60000000102 /* StatusBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +93,9 @@
 		EB818687BF95D4AE2DE5DC89 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F0CF7AB748FF15BD36CC60DC /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		FD0FB99C7F3105B76161536A /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		E7A1B2C3D4E5F60000000100 /* MicrophoneMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophoneMonitor.swift; sourceTree = "<group>"; };
+		E7A1B2C3D4E5F60000000101 /* FlashOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashOverlay.swift; sourceTree = "<group>"; };
+		E7A1B2C3D4E5F60000000102 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +187,9 @@
 			children = (
 				33CC10F02044A3C60003C045 /* AppDelegate.swift */,
 				33CC11122044BFA00003C045 /* MainFlutterWindow.swift */,
+				E7A1B2C3D4E5F60000000102 /* StatusBarController.swift */,
+				E7A1B2C3D4E5F60000000101 /* FlashOverlay.swift */,
+				E7A1B2C3D4E5F60000000100 /* MicrophoneMonitor.swift */,
 				33E51913231747F40026EE4D /* DebugProfile.entitlements */,
 				33E51914231749380026EE4D /* Release.entitlements */,
 				33CC11242044D66E0003C045 /* Resources */,
@@ -442,6 +451,9 @@
 			files = (
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
+				E7A1B2C3D4E5F60000000202 /* StatusBarController.swift in Sources */,
+				E7A1B2C3D4E5F60000000201 /* FlashOverlay.swift in Sources */,
+				E7A1B2C3D4E5F60000000200 /* MicrophoneMonitor.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

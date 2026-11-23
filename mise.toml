@@ -1,33 +1,56 @@
-[tasks]
-# Build a release version of the macOS app and push a GitHub release
-release = """
-echo "Building Eternal Now Doorbell for macOS..."
-flutter clean
+[env]
+APP_NAME = "Eternal Now Doorbell"
+APP_PATH = "build/macos/Build/Products/Release/Eternal Now Doorbell.app"
+
+[tasks.icon]
+description = "Re-render the app icon set from tool/render_icon.swift"
+run = """
+set -e
+D=macos/Runner/Assets.xcassets/AppIcon.appiconset
+swift tool/render_icon.swift assets/brand/app_icon_1024.png
+cp assets/brand/app_icon_1024.png $D/app_icon_1024.png
+for s in 16 32 64 128 256 512; do sips -z $s $s assets/brand/app_icon_1024.png --out $D/app_icon_$s.png >/dev/null; done
+echo "Icon set updated"
+"""
+
+[tasks.build]
+description = "Build the release app and sign it with your Apple Development certificate (no notarization)"
+run = """
+set -e
 flutter pub get
 flutter build macos --release
-echo "Build completed! The app can be found at:"
-echo "$(pwd)/build/macos/Build/Products/Release/mindfulness_bell.app"
+# Override with SIGN_IDENTITY=<sha or name>; falls back to ad-hoc if no cert is found.
+ID="${SIGN_IDENTITY:-$(security find-identity -v -p codesigning | grep 'Apple Development' | head -1 | awk '{print $2}')}"
+ID="${ID:--}"
+codesign --force --deep --options runtime \
+  --entitlements macos/Runner/Release.entitlements --sign "$ID" "$APP_PATH"
+codesign --verify --deep --strict "$APP_PATH"
+echo "Signed: $APP_PATH"
+"""
 
-# Get the current version from pubspec.yaml
-VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}' | tr -d "'")
-echo "Creating GitHub release for version $VERSION..."
+[tasks.install]
+description = "Build, then replace the copy in /Applications and launch it"
+depends = ["build"]
+run = """
+set -e
+osascript -e "quit app \\"$APP_NAME\\"" 2>/dev/null || true
+rm -rf "/Applications/$APP_NAME.app"
+ditto "$APP_PATH" "/Applications/$APP_NAME.app"
+open "/Applications/$APP_NAME.app"
+"""
 
-# Create a git tag for the version
+[tasks.release]
+description = "Build, tag and publish a GitHub release (signed for local use, not notarized)"
+depends = ["build"]
+run = """
+set -e
+VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+ZIP_PATH="./build/EternalNowDoorbell-v${VERSION}-macos.zip"
+ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
 git tag -a "v$VERSION" -m "Release v$VERSION"
 git push origin "v$VERSION"
-
-# Zip the app for GitHub release
-APP_NAME="EternalNowDoorbell"
-ZIP_PATH="./build/${APP_NAME}-v${VERSION}-macos.zip"
-echo "Creating zip archive of the app..."
-ditto -c -k --sequesterRsrc --keepParent "./build/macos/Build/Products/Release/mindfulness_bell.app" "$ZIP_PATH"
-echo "App zipped successfully at $ZIP_PATH"
-
-# Create GitHub release using gh CLI
 gh release create "v$VERSION" \
   --title "Eternal Now Doorbell v$VERSION" \
-  --notes "Release v$VERSION of Eternal Now Doorbell" \
+  --notes "Not notarized: right-click the app and choose Open the first time." \
   "$ZIP_PATH"
-
-echo "GitHub release v$VERSION created successfully!"
-""" 
+"""

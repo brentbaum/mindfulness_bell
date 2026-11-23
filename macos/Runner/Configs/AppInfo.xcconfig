@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = mindfulness_bell
+PRODUCT_NAME = Eternal Now Doorbell
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.mindfulnessBell
+PRODUCT_BUNDLE_IDENTIFIER = com.brentbaum.eternalnowdoorbell
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2025 Brent Baumgartner. MIT License.
