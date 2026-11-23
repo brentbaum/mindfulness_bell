@@ -19,12 +19,12 @@ final class StatusBarController: NSObject, NSMenuDelegate {
     super.init()
     if let button = item.button {
       button.image = Self.rippleIcon()
-      button.toolTip = "Eternal Now Doorbell"
+      button.toolTip = "Mindfulness Bell"
     }
     statusLine.isEnabled = false
     let ring = NSMenuItem(title: "Ring Now", action: #selector(ringNow), keyEquivalent: "")
     let open = NSMenuItem(
-      title: "Open Eternal Now…", action: #selector(openWindow), keyEquivalent: ",")
+      title: "Open Mindfulness Bell…", action: #selector(openWindow), keyEquivalent: ",")
     let quit = NSMenuItem(
       title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
     for i in [toggleItem, ring, open, loginItem] { i.target = self }

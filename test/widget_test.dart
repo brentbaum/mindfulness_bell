@@ -10,9 +10,9 @@ void main() {
     tester.view.physicalSize = const Size(420, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(DoorbellApp(prefs: prefs));
+    await tester.pumpWidget(MindfulnessBellApp(prefs: prefs));
 
-    expect(find.text('Eternal Now'), findsOneWidget);
+    expect(find.text('Mindfulness Bell'), findsOneWidget);
     expect(find.text('Paused'), findsOneWidget);
     expect(find.text('15 min'), findsOneWidget);
     expect(find.text('Start'), findsOneWidget);

@@ -1,6 +1,6 @@
 [env]
-APP_NAME = "Eternal Now Doorbell"
-APP_PATH = "build/macos/Build/Products/Release/Eternal Now Doorbell.app"
+APP_NAME = "Mindfulness Bell"
+APP_PATH = "build/macos/Build/Products/Release/Mindfulness Bell.app"
 
 [tasks.icon]
 description = "Re-render the app icon set from tool/render_icon.swift"
@@ -45,12 +45,12 @@ depends = ["build"]
 run = """
 set -e
 VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
-ZIP_PATH="./build/EternalNowDoorbell-v${VERSION}-macos.zip"
+ZIP_PATH="./build/MindfulnessBell-v${VERSION}-macos.zip"
 ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
 git tag -a "v$VERSION" -m "Release v$VERSION"
 git push origin "v$VERSION"
 gh release create "v$VERSION" \
-  --title "Eternal Now Doorbell v$VERSION" \
+  --title "Mindfulness Bell v$VERSION" \
   --notes "Not notarized: right-click the app and choose Open the first time." \
   "$ZIP_PATH"
 """

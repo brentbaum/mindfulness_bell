@@ -11,18 +11,18 @@ import 'ui.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  runApp(DoorbellApp(prefs: prefs));
+  runApp(MindfulnessBellApp(prefs: prefs));
 }
 
-class DoorbellApp extends StatelessWidget {
-  const DoorbellApp({super.key, required this.prefs, this.bridge});
+class MindfulnessBellApp extends StatelessWidget {
+  const MindfulnessBellApp({super.key, required this.prefs, this.bridge});
   final SharedPreferences prefs;
   final NativeBridge? bridge;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Eternal Now Doorbell',
+      title: 'Mindfulness Bell',
       debugShowCheckedModeBanner: false,
       theme: stillwaterTheme(),
       home: HomePage(prefs: prefs, bridge: bridge ?? NativeBridge.instance),
@@ -218,15 +218,14 @@ class _HomePageState extends State<HomePage> {
           const Row(children: [
             RippleMark(size: 34),
             SizedBox(width: 12),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Eternal Now',
+            Flexible(
+              child: Text('Mindfulness Bell',
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Still.ink)),
-              Text('Doorbell',
-                  style: TextStyle(fontSize: 14, color: Still.muted)),
-            ]),
+            ),
           ]),
           const SizedBox(height: 24),
           _statusPanel(),

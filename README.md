@@ -1,8 +1,8 @@
-# Eternal Now Doorbell
+# Mindfulness Bell
 
 A quiet mindfulness bell for the macOS menu bar. At your chosen interval it rings a bell and washes the screen in a soft sage light, then fades away.
 
-![Eternal Now Doorbell](screenshots/app_screenshot.png)
+![Mindfulness Bell](screenshots/app_screenshot.png)
 
 ## Features
 
@@ -18,7 +18,7 @@ A quiet mindfulness bell for the macOS menu bar. At your chosen interval it ring
 
 1. Download the latest release from the [Releases](https://github.com/brentbaum/mindfulness_bell/releases) page
 2. Unzip the file
-3. Right-click (or Control+click) on `Eternal Now Doorbell.app` and select "Open"
+3. Right-click (or Control+click) on `Mindfulness Bell.app` and select "Open"
 4. Click "Open" in the security dialog that appears
 
 ### Option 2: Build from source
@@ -37,7 +37,7 @@ flutter run -d macos
 
 ```bash
 mise run build    # release build, signed with your Apple Development certificate
-mise run install  # build, then replace /Applications/Eternal Now Doorbell.app and launch
+mise run install  # build, then replace /Applications/Mindfulness Bell.app and launch
 mise run icon     # re-render the icon set from tool/render_icon.swift
 mise run release  # build, tag and publish a GitHub release (not notarized)
 ```

@@ -7,7 +7,7 @@ class MainFlutterWindow: NSWindow {
     self.contentViewController = flutterViewController
 
     // Stillwater chrome: content runs under a transparent title bar.
-    title = "Eternal Now Doorbell"
+    title = "Mindfulness Bell"
     titleVisibility = .hidden
     titlebarAppearsTransparent = true
     styleMask.insert(.fullSizeContentView)

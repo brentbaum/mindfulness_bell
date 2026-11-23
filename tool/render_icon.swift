@@ -1,4 +1,4 @@
-// Renders the Eternal Now Doorbell app icon (Stillwater ripple rings) at 1024px.
+// Renders the Mindfulness Bell app icon (Stillwater ripple rings) at 1024px.
 // Usage: swift tool/render_icon.swift <out.png>
 import AppKit
 
